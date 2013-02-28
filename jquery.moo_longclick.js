@@ -25,6 +25,8 @@
         }
 
         $(this).each(function(index, element) {
+            $(element).data('moo.longclickable', true);
+
             moo_bind($(element), 'mousedown touchstart', function(evt) {
                 if ($(element).data('moo.timer')) {
                     return true;
@@ -33,7 +35,7 @@
                 var timer = window.setTimeout(function() {
                     window.clearTimeout($(element).data('moo.timer'));
                     $(element).data('moo.timer', null);
-                    handler.bind($(element))(evt);
+                    return handler.bind($(element))(evt);
                 }, duration);
 
                 return $(element).data('moo.timer', timer);
@@ -46,10 +48,13 @@
             });
 
             moo_bind($(element), 'click', function(evt) {
-                window.clearTimeout($(element).data('moo.timer'));
-                $(element).data('moo.timer', null);
-
-                return handler.bind($(element))(evt);
+                if ($(element).data('moo.longclickable')) {
+                    evt.preventDefault();
+                    evt.stopPropagation();
+                    return false;
+                } else {
+                    return true;
+                }
             });
         });
     };
